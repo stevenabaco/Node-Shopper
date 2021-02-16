@@ -55,7 +55,7 @@ module.exports = class Product {
 			if (!product) {
 				return;
 			}
-            fs.writeFile(p, JSON.stringif(updatedProducts), err => {
+            fs.writeFile(p, JSON.stringify(updatedProducts), err => {
                 if (!err) {
                     Cart.deleteProduct(id, product.price);
                 }
