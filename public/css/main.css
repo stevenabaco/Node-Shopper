@@ -200,11 +200,34 @@ form {
 	background-color: rgb(2, 4, 121);
 	color: aliceblue;
 }
+
+.user-message {
+	margin: auto;
+	width: 90%;
+	border: 1px solid rgb(2, 4, 121);
+	padding: .5rem;
+	border-radius: 3px;
+	background-color: rgb(207, 228, 236);
+	text-align: center;
+}
+
+.user-message--error {
+	border-color: red;
+	background-color: rgb(236, 197, 192);
+}
+
+
 @media (min-width: 760px) {
 	.main-header__nav {
 		display: flex;
 	}
+
 	#side-menu-toggle {
 		display: none;
 	}
+
+	.user-message {
+		width: 30rem;
+	}
+
 }
