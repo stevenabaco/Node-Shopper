@@ -21,6 +21,7 @@
 	padding: 0.5rem;
 }
 
-.form-control input.invalid {
+.form-control input.invalid,
+.form-control textarea.invalid {
 	border: 2px solid red
 }
