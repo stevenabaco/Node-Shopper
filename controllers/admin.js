@@ -1,18 +1,19 @@
-const { validationResult } = require('express-validator');
+const mongoose = require('mongoose');
+
+const fileHelper = require('../util/file');
+
+const { validationResult } = require('express-validator/check');
 
 const Product = require('../models/product');
 
 exports.getAddProduct = (req, res, next) => {
-	if (!req.session.isLoggedIn) {
-		return res.redirect('/login');
-	}
 	res.render('admin/edit-product', {
 		pageTitle: 'Add Product',
 		path: '/admin/add-product',
 		editing: false,
 		hasError: false,
 		errorMessage: null,
-		validationErrors: []
+		validationErrors: [],
 	});
 };
 
@@ -39,6 +40,7 @@ exports.postAddProduct = (req, res, next) => {
 	const errors = validationResult(req);
 
 	if (!errors.isEmpty()) {
+		console.log(errors.array());
 		return res.status(422).render('admin/edit-product', {
 			pageTitle: 'Add Product',
 			path: '/admin/add-product',
@@ -46,17 +48,19 @@ exports.postAddProduct = (req, res, next) => {
 			hasError: true,
 			product: {
 				title: title,
+				imageUrl: imageUrl,
 				price: price,
 				description: description,
 			},
 			errorMessage: errors.array()[0].msg,
-			validationErrors: errors.array()
+			validationErrors: errors.array(),
 		});
 	}
 
 	const imageUrl = image.path;
 
 	const product = new Product({
+		// _id: new mongoose.Types.ObjectId('5badf72403fd8b5be0366e81'),
 		title: title,
 		price: price,
 		description: description,
@@ -71,7 +75,21 @@ exports.postAddProduct = (req, res, next) => {
 			res.redirect('/admin/products');
 		})
 		.catch(err => {
-			// res.redirect('/500')
+			// return res.status(500).render('admin/edit-product', {
+			//   pageTitle: 'Add Product',
+			//   path: '/admin/add-product',
+			//   editing: false,
+			//   hasError: true,
+			//   product: {
+			//     title: title,
+			//     imageUrl: imageUrl,
+			//     price: price,
+			//     description: description
+			//   },
+			//   errorMessage: 'Database operation failed, please try again.',
+			//   validationErrors: []
+			// });
+			// res.redirect('/500');
 			const error = new Error(err);
 			error.httpStatusCode = 500;
 			return next(error);
@@ -81,7 +99,7 @@ exports.postAddProduct = (req, res, next) => {
 exports.getEditProduct = (req, res, next) => {
 	const editMode = req.query.edit;
 	if (!editMode) {
-		res.redirect('/');
+		return res.redirect('/');
 	}
 	const prodId = req.params.productId;
 	Product.findById(prodId)
@@ -96,7 +114,7 @@ exports.getEditProduct = (req, res, next) => {
 				product: product,
 				hasError: false,
 				errorMessage: null,
-				validationErrors: []
+				validationErrors: [],
 			});
 		})
 		.catch(err => {
@@ -124,11 +142,11 @@ exports.postEditProduct = (req, res, next) => {
 			product: {
 				title: updatedTitle,
 				price: updatedPrice,
-				description: updatedPrice,
-				_id: prodId
+				description: updatedDesc,
+				_id: prodId,
 			},
 			errorMessage: errors.array()[0].msg,
-			validationErrors: errors.array()
+			validationErrors: errors.array(),
 		});
 	}
 
@@ -141,6 +159,7 @@ exports.postEditProduct = (req, res, next) => {
 			product.price = updatedPrice;
 			product.description = updatedDesc;
 			if (image) {
+				fileHelper.deleteFile(product.imageUrl);
 				product.imageUrl = image.path;
 			}
 			return product.save().then(result => {
@@ -157,6 +176,8 @@ exports.postEditProduct = (req, res, next) => {
 
 exports.getProducts = (req, res, next) => {
 	Product.find({ userId: req.user._id })
+		// .select('title price -_id')
+		// .populate('userId', 'name')
 		.then(products => {
 			console.log(products);
 			res.render('admin/products', {
@@ -174,7 +195,14 @@ exports.getProducts = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
 	const prodId = req.body.productId;
-	Product.deleteOne({ id: prodId, userId: req.user._id })
+	Product.findById(prodId)
+		.then(product => {
+			if (!product) {
+				return next(new Error('Product not found.'));
+			}
+			fileHelper.deleteFile(product.imageUrl);
+			return Product.deleteOne({ _id: prodId, userId: req.user._id });
+		})
 		.then(() => {
 			console.log('DESTROYED PRODUCT');
 			res.redirect('/admin/products');
