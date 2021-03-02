@@ -216,6 +216,25 @@ form {
 	background-color: rgb(236, 197, 192);
 }
 
+.pagination {
+	margin-top: 2rem;
+	text-align: center;
+}
+
+.pagination a {
+	text-decoration: none;
+	color: rgb(2, 4, 121);
+	padding: 0.5rem;
+	border: 1px solid rgb(2, 4, 121);
+	margin: 0 1rem;
+}
+
+.pagination a:hover,
+.pagination a:active {
+	background-color: rgb(2, 4, 121);
+	color: white;
+
+}
 
 @media (min-width: 760px) {
 	.main-header__nav {
