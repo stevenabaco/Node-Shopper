@@ -13,6 +13,7 @@ const multer = require('multer');
 const helmet = require('helmet');
 const compression = require('compression');
 const morgan = require('morgan');
+const dotenv = require('dotenv');
 
 const errorController = require('./controllers/error');
 const shopController = require('./controllers/shop');
@@ -52,6 +53,7 @@ const fileFilter = (req, file, cb) => {
 	}
 };
 
+dotenv.config();
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
