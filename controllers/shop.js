@@ -146,7 +146,7 @@ exports.getCheckout = (req, res, next) => {
 			products = user.cart.items;
 			total = 0;
 			products.forEach(p => {
-				total += p.quantity * p.productId.price;
+				total += p.quantity * p.productId.price;;
 			});
 
 			return stripe.checkout.sessions.create({
