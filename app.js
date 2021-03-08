@@ -55,13 +55,13 @@ const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth');
 
-const accessLogStream = fs.createWriteStream(
-	path.join(__dirname, 'access.log'),
-	{ flags: 'a' }
-);
+// const accessLogStream = fs.createWriteStream(
+// 	path.join(__dirname, 'access.log'),
+// 	{ flags: 'a' }
+// );
 // app.use(helmet());
 app.use(compression());
-app.use(morgan('combined', { stream: accessLogStream }));
+// app.use(morgan('combined', { stream: accessLogStream }));
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(
