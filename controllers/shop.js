@@ -8,7 +8,7 @@ const Product = require('../models/product');
 const Order = require('../models/order');
 const { runInNewContext } = require('vm');
 
-const ITEMS_PER_PAGE = 1;
+const ITEMS_PER_PAGE = 4;
 
 exports.getProducts = (req, res, next) => {
 	const page = +req.query.page || 1;
@@ -80,7 +80,7 @@ exports.getIndex = (req, res, next) => {
 				hasPreviousPage: page > 1,
 				nextPage: page + 1,
 				previousPage: page - 1,
-				lastPage: Math.ceil(totalItems / ITEMS_PER_PAGE)
+				lastPage: Math.ceil(totalItems / ITEMS_PER_PAGE),
 			});
 		})
 		.catch(err => {
@@ -162,8 +162,7 @@ exports.getCheckout = (req, res, next) => {
 				}),
 				success_url:
 					req.protocol + '://' + req.get('host') + '/checkout/success',
-				cancel_url:
-					req.protocol + '://' + req.get('host') + '/checkout/cancel',
+				cancel_url: req.protocol + '://' + req.get('host') + '/checkout/cancel',
 			});
 		})
 		.then(session => {
@@ -172,7 +171,7 @@ exports.getCheckout = (req, res, next) => {
 				pageTitle: 'Checkout',
 				products: products,
 				totalSum: total,
-				sessionId: session.id
+				sessionId: session.id,
 			});
 		})
 		.catch(err => {
@@ -180,7 +179,7 @@ exports.getCheckout = (req, res, next) => {
 			error.httpStatusCode = 500;
 			return next(error);
 		});
-}
+};
 
 exports.getCheckoutSuccess = (req, res, next) => {
 	req.user
